@@ -1,0 +1,5 @@
+<nav class="guide-language" aria-label="{{ 'Language' if config.theme.language == 'en' else 'Dil seçimi' }}">
+  {% for alternate in config.extra.alternate %}
+    <a href="{{ alternate.link | url }}" lang="{{ alternate.lang }}" hreflang="{{ alternate.lang }}"{% if alternate.lang == config.theme.language %} aria-current="page"{% endif %}>{{ alternate.name }}</a>
+  {% endfor %}
+</nav>

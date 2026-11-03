@@ -1,0 +1,55 @@
+site_name: TT405 / MS300 Kullanım Rehberi
+site_description: B&R PLC'li TT405 ve MS300 makineleri için kesim listesi (iş dosyası) rehberi
+site_url: https://hm-info.github.io/tt405-ms300/
+
+docs_dir: docs
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: tr
+  features:
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: blue-grey
+      accent: blue-grey
+
+nav:
+  - Türkçe:
+      - Başlangıç: index.md
+      - İş Dosyaları:
+          - Kesim Listesi: cut_list_tr.md
+  - English:
+      - Getting Started: home-en.md
+      - Job Files:
+          - Cut List: cut_list_en.md
+
+use_directory_urls: false
+
+plugins:
+  - search
+
+markdown_extensions:
+  - md_in_html
+  - tables
+  - attr_list
+
+hooks:
+  - hooks/pdf_export.py
+  - hooks/navigation.py
+
+extra:
+  alternate:
+    - name: Türkçe
+      link: index.html
+      lang: tr
+    - name: English
+      link: home-en.html
+      lang: en
+
+extra_css:
+  - stylesheets/guide.css
+  - stylesheets/downloads.css

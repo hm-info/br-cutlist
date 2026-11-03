@@ -1,0 +1,31 @@
+@page {
+  size: A4;
+  margin: 17mm 14mm 18mm;
+  @bottom-left {
+    content: "MSC · hm-info.github.io/msc";
+    font: 8pt "DejaVu Sans", sans-serif;
+    color: #607080;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font: 8pt "DejaVu Sans", sans-serif;
+    color: #607080;
+  }
+}
+body { font: 9pt/1.45 "DejaVu Sans", sans-serif; color: #243344; }
+h1 { font-size: 22pt; line-height: 1.25; color: #173b57; margin: 0 0 7mm; }
+h2 { font-size: 14pt; color: #173b57; margin: 7mm 0 3mm; }
+h3 { font-size: 10.5pt; color: #173b57; margin: 5mm 0 2mm; }
+h1, h2, h3 { break-after: avoid; }
+p { margin: 2mm 0; orphans: 3; widows: 3; }
+li { margin-bottom: 1.5mm; }
+a { color: #1a5d83; text-decoration: none; overflow-wrap: anywhere; }
+img { display: block; max-width: 100%; height: auto; margin: 4mm auto; }
+table { border-collapse: collapse; width: 100%; margin: 4mm 0; font-size: 7.7pt; table-layout: auto; }
+thead { display: table-header-group; }
+th, td { border: 0.25mm solid #cbd5df; padding: 2mm; vertical-align: top; overflow-wrap: anywhere; }
+th { background: #e9f0f5; color: #173b57; text-align: left; overflow-wrap: normal; }
+table:first-of-type th:first-child { min-width: 9mm; white-space: nowrap; }
+tr { break-inside: avoid; }
+pre { background: #eef3f6; padding: 3mm; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; font-size: 8pt; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 0.92em; }
