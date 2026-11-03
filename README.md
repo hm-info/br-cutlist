@@ -6,10 +6,10 @@ B&R PLC'li TT405 ve MS300 makinelerinin kesim listesi (iş dosyası) rehberi. İ
 
 ## 📖 Documentation
 
-<https://hm-info.github.io/tt405-ms300/>
+<https://hm-info.github.io/br-cutlist/>
 
-- [Türkçe — Kesim listesi](https://hm-info.github.io/tt405-ms300/cut_list_tr.html)
-- [English — Cut list](https://hm-info.github.io/tt405-ms300/cut_list_en.html)
+- [Türkçe — Kesim listesi](https://hm-info.github.io/br-cutlist/cut_list_tr.html)
+- [English — Cut list](https://hm-info.github.io/br-cutlist/cut_list_en.html)
 
 Each guide includes a PDF download, generated from the same Markdown during each build and not committed to the source branch. The example CSV uses fictitious customer and order information.
 

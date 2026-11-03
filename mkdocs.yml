@@ -1,6 +1,6 @@
 site_name: TT405 / MS300 Kullanım Rehberi
 site_description: B&R PLC'li TT405 ve MS300 makineleri için kesim listesi (iş dosyası) rehberi
-site_url: https://hm-info.github.io/tt405-ms300/
+site_url: https://hm-info.github.io/br-cutlist/
 
 docs_dir: docs
 
