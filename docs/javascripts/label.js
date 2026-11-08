@@ -12,7 +12,7 @@
   var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
 
   /* ---------- PLC presets (only the values the PLC actually assigns) ---------- */
-  var DEF = {"tt405_103x25":{"text":{"0":{"p1":45,"p2":40,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":60,"p2":30,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":225,"p2":30,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":225,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":650,"p2":5,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":60,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":315,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":400,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":60,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":60,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":315,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":600,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"enable":0,"p1":0,"p2":0,"p3":0,"p4":0,"p5":0,"p6":0,"p7":0}},"bc":{"p1":60,"p2":110,"p3":0,"p4":6,"p5":2,"p6":2,"p7":60,"p8":0},"bcid":{"p1":30,"p2":0,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":15,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}},"tt405_103x20":{"text":{"0":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":30,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":215,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":375,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":650,"p2":5,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":30,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":285,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":575,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":660,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":30,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":285,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":550,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"enable":0,"p1":0,"p2":0,"p3":0,"p4":0,"p5":0,"p6":0,"p7":0}},"bc":{"p1":30,"p2":110,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"bcid":{"p1":30,"p2":0,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":15,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}},"tt405_d2":{"text":{"6":{"p1":575,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"1":{"p1":30,"p2":5,"p3":0,"p4":3,"p5":1,"p6":1,"p7":0},"5":{"p1":30,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"14":{"p1":285,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":30,"p2":86,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":575,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0}},"bc":{"p1":250,"p2":84,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":1}},"ms300":{"text":{"0":{"p1":10,"p2":5,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":45,"p2":10,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":205,"p2":10,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":45,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":205,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":345,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":500,"p2":10,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":45,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":260,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":45,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":195,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":345,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":5,"p2":15,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1}},"bc":{"p1":30,"p2":90,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":10,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}}};
+  var DEF = {"tt405_103x25":{"text":{"0":{"p1":45,"p2":40,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":60,"p2":30,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":225,"p2":30,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":225,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":650,"p2":5,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":60,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":315,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":400,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":60,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":60,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":315,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":600,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"enable":0,"p1":0,"p2":0,"p3":0,"p4":0,"p5":0,"p6":0,"p7":0}},"bc":{"p1":60,"p2":110,"p3":0,"p4":6,"p5":2,"p6":2,"p7":60,"p8":0},"bcid":{"p1":30,"p2":0,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":15,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}},"tt405_103x20":{"text":{"0":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":30,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":215,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":375,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":650,"p2":5,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":30,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":285,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":575,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":660,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":30,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":285,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":550,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"enable":0,"p1":0,"p2":0,"p3":0,"p4":0,"p5":0,"p6":0,"p7":0}},"bc":{"p1":30,"p2":110,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"bcid":{"p1":30,"p2":0,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":15,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}},"tt405_d2":{"text":{"6":{"p1":575,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"1":{"p1":30,"p2":5,"p3":0,"p4":3,"p5":1,"p6":1,"p7":0},"5":{"p1":30,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"14":{"p1":285,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":30,"p2":86,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":575,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0}},"bc":{"p1":250,"p2":84,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":1}},"ms300":{"text":{"0":{"p1":10,"p2":5,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":45,"p2":10,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":205,"p2":10,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":45,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":205,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":345,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":500,"p2":10,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":45,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":260,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":45,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":195,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":345,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":5,"p2":15,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"p1":560,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0}},"bc":{"p1":30,"p2":90,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":10,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}}};
 
   var BC_TYPES = ["3", "3C", "9", "0", "1", "1A", "1B", "1C", "1D", "K", "E80", "E82", "E85", "E30", "E32", "E35",
     "2G", "2", "1E", "UA0", "UA2", "UA5", "UE0", "UE2", "UE5", "2U", "L", "M"];
@@ -69,14 +69,16 @@
     Object.keys(DEF.ms300.text).forEach(function (k) { assign(st.text[k], DEF.ms300.text[k]); });
     assign(st.bc, DEF.ms300.bc); assign(st.label, DEF.ms300.label);
     for (var i = 0; i <= 13; i++) st.text[i].enable = 1;
+    st.text[14].enable = 1;                                          // angle line (new version)
   }
+  function lineName(i) { return i === 14 && state && state.machine === "ms300" ? T("Açı", "Angle") : LINE_NAMES[i]; }
   function freshState() {
     var s = { machine: "ms300", tab: 0, line: 0, lang: EN ? "en" : "tr", tol: 0, angle: 1, row: SAMPLES[0],
-      tt405: emptyMachine(15), ms300: emptyMachine(14) };
+      tt405: emptyMachine(15), ms300: emptyMachine(15) };
     loadTT405(s.tt405); loadMS300(s.ms300);
     return s;
   }
-  var KEY = "br-cutlist-label-v2";
+  var KEY = "br-cutlist-label-v3";
   var state;
   try { state = JSON.parse(window.localStorage.getItem(KEY)); } catch (e) { state = null; }
   if (!state || !state.tt405 || !state.ms300) state = freshState();
@@ -199,7 +201,7 @@
     t[2] = "ARABA NO:" + g.cart;
     t[3] = ISLEM_TR[r.islem] || "";
     t[4] = LOC_TR[r.frame] || "";
-    if (o.angle && (r.angL > 0 || r.angR > 0)) t[4] += " ACI:" + Math.round(r.angL) + "/" + Math.round(r.angR);
+    t[14] = r.angL > 0 || r.angR > 0 ? "ACI:" + Math.round(r.angL) + "/" + Math.round(r.angR) : "";
     t[5] = "YER:" + g.loc;
     t[6] = "POZ NO:" + g.pos;
     t[7] = "LENGTH:" + g.lenS + "mm";
@@ -217,6 +219,10 @@
       if (!st.text[k].enable) continue;
       texts.push({ idx: k, f: st.text[k], s: t[k] });
       lines.push(aCmd(st.text[k], t[k]));
+    }
+    if (o.angle && st.text[14].enable && t[14] !== "") {           // angle line (new version)
+      texts.push({ idx: 14, f: st.text[14], s: t[14] });
+      lines.push(aCmd(st.text[14], t[14]));
     }
     lines.push(bCmd(st.bc) + '"' + bc + '"', "P1");
     return { lines: lines, texts: texts, barcodes: [{ b: st.bc, data: bc, idx: "bc" }], parts: parts };
@@ -271,7 +277,7 @@
       var txt = el("text", { x: 0, y: h * 0.82, "font-size": h * 0.95, textLength: w, lengthAdjust: "spacingAndGlyphs",
         "class": f.p7 ? "lt-txt lt-txt--rev" : "lt-txt" }, grp);
       txt.textContent = t.s;
-      el("title", {}, grp).textContent = LINE_NAMES[t.idx] + ": " + t.s;
+      el("title", {}, grp).textContent = lineName(t.idx) + ": " + t.s;
       if (state.tab === 0 && t.idx === state.line) sel = { x: x, y: y, w: w, h: h, rot: rot };
       grp.addEventListener("click", function () { onPick(0, t.idx); });
       grow(box(x, y, w, h, rot));
@@ -364,16 +370,16 @@
     data.innerHTML = "";
     var tt = state.machine === "tt405";
     var machine = select([["ms300", "MS300"], ["tt405", "TT405"]], state.machine);
-    machine.addEventListener("change", function () { state.machine = machine.value; if (state.line > 11 && state.machine === "ms300") state.line = 0; refresh(true); });
+    machine.addEventListener("change", function () { state.machine = machine.value; refresh(true); });
     data.appendChild(field(T("Makine", "Machine"), machine));
     if (tt) {
       var lang = select([["tr", T("Türkçe", "Turkish")], ["en", T("İngilizce", "English")]], state.lang);
       lang.addEventListener("change", function () { state.lang = lang.value; refresh(); });
       data.appendChild(field(T("Makine dili", "Machine language"), lang));
     } else {
-      var angle = select([["1", T("Var (yeni sürüm)", "On (new version)")], ["0", T("Yok (eski sürüm)", "Off (old version)")]], state.angle);
-      angle.addEventListener("change", function () { state.angle = parseInt(angle.value, 10); refresh(); });
-      data.appendChild(field(T("Açı eki", "Angle suffix"), angle));
+      var angle = select([["1", T("Yeni (açı satırı var)", "New (with angle line)")], ["0", T("Eski (açı yok)", "Old (no angle)")]], state.angle);
+      angle.addEventListener("change", function () { state.angle = parseInt(angle.value, 10); if (!state.angle && state.line === 14) state.line = 0; refresh(true); });
+      data.appendChild(field(T("Yazılım", "Software"), angle));
     }
     var tol = numInput(state.tol, -99, 99); tol.step = "0.1";
     tol.addEventListener("input", function () { state.tol = num(tol.value); refresh(); });
@@ -415,8 +421,8 @@
     panel.innerHTML = "";
     var s = st(), tt = state.machine === "tt405", grid = mk("div", "lt-grid");
     if (state.tab === 0) {
-      var max = tt ? 14 : 13, opts = [];
-      for (var i = 0; i <= max; i++) opts.push([String(i), LINE_NAMES[i] + (i === 12 || i === 13 ? T(" (manuel baskı)", " (manual print)") : "")]);
+      var max = tt || state.angle ? 14 : 13, opts = [];
+      for (var i = 0; i <= max; i++) opts.push([String(i), lineName(i) + (i === 12 || i === 13 ? T(" (manuel baskı)", " (manual print)") : "")]);
       var lineSel = select(opts, state.line);
       lineSel.addEventListener("change", function () { state.line = parseInt(lineSel.value, 10); refresh(true); });
       grid.appendChild(field(T("Yazı", "Text"), lineSel));

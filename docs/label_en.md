@@ -80,11 +80,11 @@ Label text contains no Turkish characters. Line numbers match the order on the m
 | 9 | Profile | `PROFIL:` | `PROFIL:` | `PROFIL:` | 3 Profile Code (max. 12) |
 | 10 | Dealer | `BAYI:` | `VENDOR:` | `BAYI:` | 16 Dealer Name (TT405: 16, MS300: 12 characters) |
 | 11 | Customer | `MUSTERI:` | `CLIENT:` | `MUSTER:` | 8 Order No (10 characters) |
-| 14 | Height | `YUKSEKLIK:` | `HEIGHT:` | — | Printed only with TT405 barcode design 2 |
+| 14 | TT405: Height · MS300: Angle | `YUKSEKLIK:` | `HEIGHT:` | `ACI:45/90` | TT405: printed only with barcode design 2 · MS300 (new version): 4 Left Angle / 5 Right Angle |
 
 X and Y on the frame line are the length and other axis values minus the **weld allowance** (Settings page).
 
-**MS300 angle suffix (new version):** in the new MS300 software the left / right angles from the cut list are appended to the location line (4): `UST(Y) ACI:45/90`. If both angles are 0 nothing is appended. The angles are not part of the barcode data. The simulator has it on by default; choose Angle suffix → Off for the old version.
+**MS300 angle line (new version):** in the new MS300 software the left / right angles from the cut list are printed as a separate text line: `ACI:45/90`. It is selected as **Angle** (14) in the Printer Settings → Text list; its position, font, rotation and enable state are set like the other lines. If both angles are 0 the line is not printed. The angles are not part of the barcode data. Choose Software → Old in the simulator for the version without the angle line.
 
 ### Lines that change with TT405 barcode design 2
 
@@ -191,6 +191,7 @@ The **Load SW Format** button on the Printer Settings page loads the positions b
 | 9 | Profile | 30, 90 | 60, 90 | 45, 66 |
 | 10 | Dealer | 285, 90 | 315, 90 | 195, 66 |
 | 11 | Customer | 550, 90 | 600, 90 | 345, 66 |
+| 14 | Angle (MS300 only, new version) | — | — | 560, 46 |
 | — | Barcode (height) | 30, 110 (40) | 60, 110 (60) | 30, 90 (40) |
 | — | 2nd barcode | 30, 0 (40) | 30, 0 (40) | — |
 
