@@ -184,14 +184,14 @@ The **Load SW Format** button on the Printer Settings page loads the positions b
 | 2 | Car No | 215, 50 | 225, 30 | 205, 10 |
 | 3 | Operation | 660, 70 | 60, 50 | 45, 26 |
 | 4 | Loc. on frame | 575, 70 | 400, 50 | 205, 26 |
-| 5 | Location | 375, 50 | 225, 50 | 345, 26 |
-| 6 | Poz No (vertical multiplier 2) | 650, 5 | 650, 5 | 500, 10 |
+| 5 | Location | 375, 50 | 225, 50 | 380, 10 |
+| 6 | Poz No (vertical multiplier 2) | 650, 5 | 650, 5 | 650, 10 |
 | 7 | Length | 30, 70 | 60, 70 | 45, 46 |
-| 8 | Frame | 285, 70 | 315, 70 | 260, 46 |
+| 8 | Frame | 285, 70 | 315, 70 | 300, 46 |
 | 9 | Profile | 30, 90 | 60, 90 | 45, 66 |
-| 10 | Dealer | 285, 90 | 315, 90 | 195, 66 |
-| 11 | Customer | 550, 90 | 600, 90 | 345, 66 |
-| 14 | Angle (MS300 only, new version) | — | — | 560, 46 |
+| 10 | Dealer | 285, 90 | 315, 90 | 300, 66 |
+| 11 | Customer | 550, 90 | 600, 90 | 550, 66 |
+| 14 | Angle (MS300 only, new version) | — | — | 550, 46 |
 | — | Barcode (height) | 30, 110 (40) | 60, 110 (60) | 30, 90 (40) |
 | — | 2nd barcode | 30, 0 (40) | 30, 0 (40) | — |
 
