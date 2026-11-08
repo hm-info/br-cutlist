@@ -8,6 +8,7 @@ from mkdocs.structure.nav import Navigation, Section
 PAIRS = (
     ("index.md", "home-en.md"),
     ("cut_list_tr.md", "cut_list_en.md"),
+    ("label_tr.md", "label_en.md"),
 )
 
 
@@ -17,9 +18,9 @@ def on_page_context(context, page, config, nav, **kwargs):
     english = source == pair[1]
     language = "en" if english else "tr"
     labels = (
-        ("Getting started", "Cut list")
+        ("Getting started", "Cut list", "Label and barcode")
         if english else
-        ("Başlangıç", "Kesim listesi")
+        ("Başlangıç", "Kesim listesi", "Etiket ve barkod")
     )
     sources = [item[1 if english else 0] for item in PAIRS]
     pages_by_source = {item.file.src_uri: item for item in nav.pages}
@@ -33,6 +34,7 @@ def on_page_context(context, page, config, nav, **kwargs):
 
     sections = [
         Section("Job files" if english else "İş dosyaları", [pages[1]]),
+        Section("Labels" if english else "Etiket", [pages[2]]),
     ]
     for section in sections:
         section.active = any(item.active for item in section.children)
@@ -46,7 +48,7 @@ def on_page_context(context, page, config, nav, **kwargs):
     local_config["theme"]["language"] = language
     local_config["site_name"] = "TT405 / MS300 User Guide" if english else "TT405 / MS300 Kullanım Rehberi"
     local_config["site_description"] = (
-        "Cut list (job file) guide for TT405 and MS300 machines with B&R PLC."
+        "Cut list (job file) and label guide for TT405 and MS300 machines with B&R PLC."
         if english else config["site_description"]
     )
     local_config["extra"] = dict(config["extra"])

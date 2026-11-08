@@ -1,5 +1,5 @@
 site_name: TT405 / MS300 Kullanım Rehberi
-site_description: B&R PLC'li TT405 ve MS300 makineleri için kesim listesi (iş dosyası) rehberi
+site_description: B&R PLC'li TT405 ve MS300 makineleri için kesim listesi (iş dosyası) ve etiket rehberi
 site_url: https://hm-info.github.io/br-cutlist/
 
 docs_dir: docs
@@ -22,10 +22,14 @@ nav:
       - Başlangıç: index.md
       - İş Dosyaları:
           - Kesim Listesi: cut_list_tr.md
+      - Etiket:
+          - Etiket ve Barkod: label_tr.md
   - English:
       - Getting Started: home-en.md
       - Job Files:
           - Cut List: cut_list_en.md
+      - Labels:
+          - Label and Barcode: label_en.md
 
 use_directory_urls: false
 
@@ -53,3 +57,7 @@ extra:
 extra_css:
   - stylesheets/guide.css
   - stylesheets/downloads.css
+  - stylesheets/label.css
+
+extra_javascript:
+  - javascripts/label.js

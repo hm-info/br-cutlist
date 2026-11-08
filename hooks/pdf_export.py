@@ -28,6 +28,10 @@ def on_pre_build(config, **kwargs):
         content = re.sub(
             r'<div class="document-tools"[^>]*>.*?</div>', "", content, flags=re.S
         )
+        # Interactive tools only work on the website.
+        content = re.sub(
+            r"<!-- web-only -->.*?<!-- /web-only -->", "", content, flags=re.S
+        )
         article = markdown.markdown(
             content, extensions=["tables", "fenced_code", "md_in_html", "toc", "attr_list"]
         )

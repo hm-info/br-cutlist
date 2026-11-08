@@ -1,0 +1,24 @@
+.label-tool { margin: 1rem 0 2rem; }
+.lt-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .75rem 1rem; padding: 1rem; border: 1px solid #d4dfe4; border-radius: .5rem; background: #f6f9fa; }
+.lt-field { display: flex; flex-direction: column; gap: .25rem; font-size: .7rem; font-weight: 650; color: #365969; }
+.lt-field[hidden] { display: none; }
+.lt-field--wide { grid-column: 1 / -1; }
+.lt-field select, .lt-field input { font: inherit; font-weight: 400; font-size: .8rem; color: #243b47; padding: .35rem .45rem; border: 1px solid #bdccd4; border-radius: .3rem; background: #fff; min-width: 0; }
+.lt-field input.lt-row { font-family: var(--md-code-font-family, monospace); font-size: .75rem; }
+.lt-field select:focus-visible, .lt-field input:focus-visible, .lt-copy:focus-visible { outline: 3px solid #dfa927; outline-offset: 1px; }
+.md-typeset .label-tool h3 { margin: 1.4rem 0 .6rem; }
+.lt-preview { margin: 0; overflow-x: auto; }
+.lt-svg { display: block; width: 100%; min-width: 34rem; height: auto; }
+.lt-label { fill: #fff; stroke: #607d8b; stroke-width: 1.5; }
+.lt-overflow { fill: #e5393514; stroke: #e53935; stroke-width: 1; stroke-dasharray: 6 4; }
+.lt-txt { font-family: "DejaVu Sans Mono", Consolas, monospace; fill: #111; }
+.lt-txt--rev { fill: #fff; }
+.lt-rev, .lt-bar { fill: #111; }
+.md-typeset .lt-preview figcaption { margin: .4rem 0 0; max-width: none; font-size: .65rem; color: #52636c; text-align: left; }
+.md-typeset .lt-table { font-size: .72rem; }
+.md-typeset .lt-table code { white-space: pre; word-break: break-all; }
+.md-typeset .lt-table tr.lt-total td { font-weight: 700; }
+.lt-copy { margin-bottom: .4rem; padding: .35rem .75rem; border: 1px solid #bdccd4; border-radius: .3rem; background: #fff; color: #365969; font-size: .7rem; font-weight: 650; cursor: pointer; }
+.lt-copy:hover { border-color: #607d8b; }
+.md-typeset pre.lt-epl { margin-top: 0; padding: .8rem; border-radius: .3rem; background: #eef3f6; font-size: .72rem; line-height: 1.5; white-space: pre; overflow-x: auto; }
+@media (max-width: 640px) { .lt-form { grid-template-columns: 1fr 1fr; padding: .75rem; } }
