@@ -80,11 +80,11 @@ Etiket metninde Türkçe karakter kullanılmaz. Satır numaraları makinedeki Ya
 | 9 | Profil | `PROFIL:` | `PROFIL:` | `PROFIL:` | 3 Profil Kodu (en fazla 12) |
 | 10 | Bayi | `BAYI:` | `VENDOR:` | `BAYI:` | 16 Bayi Adı (TT405: 16, MS300: 12 karakter) |
 | 11 | Müşteri | `MUSTERI:` | `CLIENT:` | `MUSTER:` | 8 Sipariş No (10 karakter) |
-| 14 | TT405: Yükseklik · MS300: Açı | `YUKSEKLIK:` | `HEIGHT:` | `ACI:45/90` | TT405: yalnız barkod tasarımı 2'de basılır · MS300 (yeni sürüm): 4 Sol Açı / 5 Sağ Açı |
+| 14 | TT405: Yükseklik · MS300: Açı | `YUKSEKLIK:` | `HEIGHT:` | `ACI:45/90` | TT405: yalnız barkod tasarımı 2'de basılır · MS300 (V26.1 ve sonrası): 4 Sol Açı / 5 Sağ Açı |
 
 Çerçeve satırındaki X ve Y, uzunluk ve diğer eksen değerinden **kaynak payı** (Ayarlar sayfası) çıkarılarak yazılır.
 
-**MS300 açı satırı (yeni sürüm):** MS300'ün yeni yazılımında kesim listesindeki sol / sağ açı ayrı bir yazı satırı olarak basılır: `ACI:45/90`. Satır, Yazıcı Ayarı → Yazı listesinde **Açı** (14) olarak seçilir; konumu, fontu, yönü ve aktif / pasif durumu diğer satırlar gibi ayarlanır. Açıların ikisi de 0 ise satır basılmaz. Açılar barkod verisine girmez. Simülatörde Yazılım → Eski seçilirse açı satırı olmaz.
+**MS300 açı satırı (PLC yazılımı V26.1 ve sonrası):** Kesim listesindeki sol / sağ açı ayrı bir yazı satırı olarak basılır: `ACI:45/90`. Satır, Yazıcı Ayarı → Yazı listesinde **Açı** (14) olarak seçilir; konumu, fontu, yönü ve aktif / pasif durumu diğer satırlar gibi ayarlanır. Açıların ikisi de 0 ise satır basılmaz. Açılar barkod verisine girmez. V26.1 öncesi yazılımlarda bu satır yoktur; simülatörde PLC yazılımı → V26.1 öncesi seçilirse açı satırı gösterilmez.
 
 ### TT405 barkod tasarımı 2'de değişen satırlar
 
@@ -191,7 +191,7 @@ Yazıcı Ayarı sayfasındaki **Ön Ayarlı Parametreleri Yükle** düğmesi aş
 | 9 | Profil | 30, 90 | 60, 90 | 45, 66 |
 | 10 | Bayi | 285, 90 | 315, 90 | 300, 66 |
 | 11 | Müşteri | 550, 90 | 600, 90 | 550, 66 |
-| 14 | Açı (yalnız MS300, yeni sürüm) | — | — | 550, 46 |
+| 14 | Açı (yalnız MS300, V26.1 ve sonrası) | — | — | 550, 46 |
 | — | Barkod (yükseklik) | 30, 110 (40) | 60, 110 (60) | 30, 90 (40) |
 | — | 2. barkod | 30, 0 (40) | 30, 0 (40) | — |
 

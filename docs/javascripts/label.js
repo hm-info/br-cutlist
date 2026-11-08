@@ -377,9 +377,9 @@
       lang.addEventListener("change", function () { state.lang = lang.value; refresh(); });
       data.appendChild(field(T("Makine dili", "Machine language"), lang));
     } else {
-      var angle = select([["1", T("Yeni (açı satırı var)", "New (with angle line)")], ["0", T("Eski (açı yok)", "Old (no angle)")]], state.angle);
+      var angle = select([["1", T("V26.1 ve sonrası (açı satırı var)", "V26.1 and later (with angle line)")], ["0", T("V26.1 öncesi (açı satırı yok)", "Before V26.1 (no angle line)")]], state.angle);
       angle.addEventListener("change", function () { state.angle = parseInt(angle.value, 10); if (!state.angle && state.line === 14) state.line = 0; refresh(true); });
-      data.appendChild(field(T("Yazılım", "Software"), angle));
+      data.appendChild(field(T("PLC yazılımı", "PLC software"), angle));
     }
     var tol = numInput(state.tol, -99, 99); tol.step = "0.1";
     tol.addEventListener("input", function () { state.tol = num(tol.value); refresh(); });
