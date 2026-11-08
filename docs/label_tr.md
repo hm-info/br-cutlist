@@ -15,7 +15,7 @@ TT405 ve MS300, kesilen parçanın etiketini **EPL2** komut diliyle doğrudan et
 <!-- web-only -->
 ## Etiket simülatörü
 
-Makineyi ve ayarları seçin, kesim listesinden bir satır yapıştırın. Sayfa, makinenin göndereceği komutları ve yaklaşık etiket görünümünü üretir. Konumlar makinenin **ön ayarlı (varsayılan) düzenidir**; makinede Yazıcı Ayarı sayfasından değiştirilmiş konumlar farklı olabilir.
+Simülatör, makinenin **Yazıcı Ayarı** sayfasının bir kopyasıdır (Yazı, Barkod, Etiket ve Yazıcı Ayarı sekmeleri). İlk açılışta PLC'nin ön ayarları yüklüdür. Kesim listesinden bir satır yapıştırın ve ayarları makinedeki gibi değiştirin; etiket önizlemesi, barkod içeriği ve yazıcıya giden komutlar PLC'deki kurallarla yeniden oluşur. Önizlemede bir yazıya veya barkoda tıklayınca ayarı açılır. Değişiklikler yalnız bu tarayıcıda saklanır; **Yazıcı Ayarı → ön ayarları yükle** düğmesi PLC'deki aynı işi yapar.
 
 <div id="label-tool" class="label-tool" data-lang="tr"></div>
 <!-- /web-only -->
@@ -84,7 +84,7 @@ Etiket metninde Türkçe karakter kullanılmaz. Satır numaraları makinedeki Ya
 
 Çerçeve satırındaki X ve Y, uzunluk ve diğer eksen değerinden **kaynak payı** (Ayarlar sayfası) çıkarılarak yazılır.
 
-**MS300 açı eki (yeni sürüm):** MS300'ün yeni yazılımında konum satırının sonuna sol / sağ açı eklenir: `UST(Y) ACI:45/90`. Açıların ikisi de 0 ise ek yazılmaz.
+**MS300 açı eki (yeni sürüm):** MS300'ün yeni yazılımında konum satırının (4) sonuna kesim listesindeki sol / sağ açı eklenir: `UST(Y) ACI:45/90`. Açıların ikisi de 0 ise ek yazılmaz. Açılar barkod verisine girmez. Simülatörde varsayılan olarak açıktır; eski sürüm için Açı eki → Yok seçilir.
 
 ### TT405 barkod tasarımı 2'de değişen satırlar
 
@@ -203,4 +203,5 @@ TT405 barkod tasarımı 2 seçiliyken ön ayar yüklenirse şu konumlar değişi
 - **MS300 koyuluk:** koyuluk değeri `D` komutu yerine ikinci bir `S` (hız) komutuyla gönderiliyor; yazıcı bu değeri hız olarak yorumlayabilir.
 - **TT405 barkod tasarımı 1:** renk alanı her zaman `00` yazılıyor; kesim listesindeki renk kodu bu tasarımda barkoda girmiyor.
 - **Poz No satırı:** ön ayar yüklemesi bu satırın rotasyonunu değiştirmiyor; önceki değer kalır.
+- **MS300 C70 paneli, Barkod sekmesi:** dikey başlangıç kutusunun üstünde "Çizgi Genişliği", çizgi genişliği kutusunun üstünde "Dikey Başl." yazıyor (yazılar yer değiştirmiş). Simülatör doğru adları kullanır ve panelde yazanı not olarak gösterir.
 - **Etiket boyu:** 103x25 düzeninde barkodun altı 160 noktalık etiket boyunu aşar; etiket uzunluğu ayarı buna göre girilmelidir.

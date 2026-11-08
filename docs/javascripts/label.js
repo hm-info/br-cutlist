@@ -1,5 +1,7 @@
-/* TT405 / MS300 label simulator: builds the EPL2 command stream the machine
-   sends to the label printer and draws an approximate preview. */
+/* TT405 / MS300 label simulator.
+   A web copy of the machine's Printer Settings page: the settings start with the
+   PLC preset ("Load SW format") and every edit rebuilds the EPL2 command stream
+   with the same rules as the PLC label code. */
 (function () {
   "use strict";
 
@@ -7,44 +9,24 @@
   if (!root) return;
   var EN = root.getAttribute("data-lang") === "en";
   var T = function (tr, en) { return EN ? en : tr; };
+  var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
 
-  /* ---------- Factory default layouts ("Load SW format") ---------- */
-  function L(p1, p2, p3, p4, p5, p6, p7) { return { p1: p1, p2: p2, p3: p3, p4: p4, p5: p5, p6: p6, p7: p7 }; }
-  var LAYOUTS = {
-    tt405_103x25: {
-      label: { Q1: 160, Q2: 24, q: 840, R1: 5, R2: 1, S: 3, D: 15, Z: 1 },
-      text: { 0: L(45, 40, 1, 1, 1, 1, 1), 1: L(60, 30, 0, 2, 1, 1, 0), 2: L(225, 30, 0, 2, 1, 1, 0), 3: L(60, 50, 0, 2, 1, 1, 0),
-        4: L(400, 50, 0, 2, 1, 1, 0), 5: L(225, 50, 0, 2, 1, 1, 0), 6: L(650, 5, 0, 2, 1, 2, 0), 7: L(60, 70, 0, 2, 1, 1, 0),
-        8: L(315, 70, 0, 2, 1, 1, 0), 9: L(60, 90, 0, 2, 1, 1, 0), 10: L(315, 90, 0, 2, 1, 1, 0), 11: L(600, 90, 0, 2, 1, 1, 0),
-        14: L(0, 0, 0, 0, 0, 0, 0) },
-      bc: { p1: 60, p2: 110, p3: 0, p4: 6, p5: 2, p6: 2, p7: 60, p8: 0 },
-      bcid: { p1: 30, p2: 0, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 0 }
-    },
-    tt405_103x20: {
-      label: { Q1: 160, Q2: 24, q: 840, R1: 5, R2: 1, S: 3, D: 15, Z: 1 },
-      text: { 0: L(20, 10, 1, 1, 1, 1, 1), 1: L(30, 50, 0, 2, 1, 1, 0), 2: L(215, 50, 0, 2, 1, 1, 0), 3: L(660, 70, 0, 2, 1, 1, 0),
-        4: L(575, 70, 0, 2, 1, 1, 0), 5: L(375, 50, 0, 2, 1, 1, 0), 6: L(650, 5, 0, 2, 1, 2, 0), 7: L(30, 70, 0, 2, 1, 1, 0),
-        8: L(285, 70, 0, 2, 1, 1, 0), 9: L(30, 90, 0, 2, 1, 1, 0), 10: L(285, 90, 0, 2, 1, 1, 0), 11: L(550, 90, 0, 2, 1, 1, 0),
-        14: L(0, 0, 0, 0, 0, 0, 0) },
-      bc: { p1: 30, p2: 110, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 0 },
-      bcid: { p1: 30, p2: 0, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 0 }
-    },
-    /* Barcode design 2 overrides (applied on top of the selected label size) */
-    tt405_design2: {
-      text: { 1: L(30, 5, 0, 3, 1, 1, 0), 2: L(30, 86, 0, 2, 1, 1, 0), 5: L(30, 26, 0, 2, 1, 1, 0), 6: L(575, 26, 0, 2, 1, 1, 0),
-        11: L(575, 66, 0, 2, 1, 1, 0), 14: L(285, 26, 0, 2, 1, 1, 0) },
-      bc: { p1: 250, p2: 84, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 1 }
-    },
-    ms300: {
-      label: { Q1: 160, Q2: 24, q: 840, R1: 5, R2: 1, S: 3, D: 10, Z: 1 },
-      text: { 0: L(10, 5, 1, 1, 1, 1, 1), 1: L(45, 10, 0, 2, 1, 1, 0), 2: L(205, 10, 0, 2, 1, 1, 0), 3: L(45, 26, 0, 2, 1, 1, 0),
-        4: L(205, 26, 0, 2, 1, 1, 0), 5: L(345, 26, 0, 2, 1, 1, 0), 6: L(500, 10, 0, 2, 1, 2, 0), 7: L(45, 46, 0, 2, 1, 1, 0),
-        8: L(260, 46, 0, 2, 1, 1, 0), 9: L(45, 66, 0, 2, 1, 1, 0), 10: L(195, 66, 0, 2, 1, 1, 0), 11: L(345, 66, 0, 2, 1, 1, 0) },
-      bc: { p1: 30, p2: 90, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 0 }
-    }
-  };
+  /* ---------- PLC presets (only the values the PLC actually assigns) ---------- */
+  var DEF = {"tt405_103x25":{"text":{"0":{"p1":45,"p2":40,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":60,"p2":30,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":225,"p2":30,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":225,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":650,"p2":5,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":60,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":315,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":400,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":60,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":60,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":315,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":600,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"enable":0,"p1":0,"p2":0,"p3":0,"p4":0,"p5":0,"p6":0,"p7":0}},"bc":{"p1":60,"p2":110,"p3":0,"p4":6,"p5":2,"p6":2,"p7":60,"p8":0},"bcid":{"p1":30,"p2":0,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":15,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}},"tt405_103x20":{"text":{"0":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":30,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":215,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":375,"p2":50,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":650,"p2":5,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":30,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":285,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":575,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":660,"p2":70,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":30,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":285,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":550,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":90,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":20,"p2":10,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"14":{"enable":0,"p1":0,"p2":0,"p3":0,"p4":0,"p5":0,"p6":0,"p7":0}},"bc":{"p1":30,"p2":110,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"bcid":{"p1":30,"p2":0,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":15,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}},"tt405_d2":{"text":{"6":{"p1":575,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"1":{"p1":30,"p2":5,"p3":0,"p4":3,"p5":1,"p6":1,"p7":0},"5":{"p1":30,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"14":{"p1":285,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":30,"p2":86,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":575,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0}},"bc":{"p1":250,"p2":84,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":1}},"ms300":{"text":{"0":{"p1":10,"p2":5,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1},"1":{"p1":45,"p2":10,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"2":{"p1":205,"p2":10,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"3":{"p1":45,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"4":{"p1":205,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"5":{"p1":345,"p2":26,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"6":{"p1":500,"p2":10,"p6":2,"p4":2,"p5":1,"p7":0},"7":{"p1":45,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"8":{"p1":260,"p2":46,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"9":{"p1":45,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"10":{"p1":195,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"11":{"p1":345,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"12":{"p1":45,"p2":66,"p3":0,"p4":2,"p5":1,"p6":1,"p7":0},"13":{"p1":5,"p2":15,"p3":1,"p4":1,"p5":1,"p6":1,"p7":1}},"bc":{"p1":30,"p2":90,"p3":0,"p4":6,"p5":2,"p6":2,"p7":40,"p8":0},"label":{"Dp1":10,"Qp1":160,"qp1":840,"Qp2":24,"Rp1":5,"Rp2":1,"Sp1":3,"Zp1":1}}};
+
   var BC_TYPES = ["3", "3C", "9", "0", "1", "1A", "1B", "1C", "1D", "K", "E80", "E82", "E85", "E30", "E32", "E35",
     "2G", "2", "1E", "UA0", "UA2", "UA5", "UE0", "UE2", "UE5", "2U", "L", "M"];
+  var BC_NAMES = ["Code 39 std.", "Code 39 with check digit", "Code 93", "Code 128 UCC", "Code 128 auto A, B, C",
+    "Code 128 mode A", "Code 128 mode B", "Code 128 mode C", "Code 128 with Deu.Post", "Codabar", "EAN8",
+    "EAN8 2 digit add-on", "EAN8 5 digit add-on", "EAN13", "EAN13 2 digit add-on", "EAN13 5 digit add-on",
+    "German Post Code", "Interleaved 2 of 5", "UCC/EAN 128", "UPC A", "UPC A 2 digit add-on", "UPC A 5 digit add-on",
+    "UPC E", "UPC E 2 digit add-on", "UPC E 5 digit add-on", "UPC Interleaved 2 of 5", "Plessey (MSI-1)",
+    "MSI-3 with mod. 10 check digit"];
+  var LINE_NAMES = T(
+    ["Logo", "Prog No", "Araba No", "İşlem", "Çerçevedeki Yer", "Yer", "Poz No", "Uzunluk", "Çerçeve", "Profil", "Bayi",
+      "Müşteri", "Logo Manuel", "Uzunluk Manuel", "Yükseklik"],
+    ["Logo", "Prog No", "Car No", "Operation", "Loc. on frame", "Location", "Poz No", "Length", "Frame", "Profile",
+      "Dealer", "Customer", "Manual Logo", "Manual Length", "Height"]);
 
   var SAMPLES = [
     "1;806;XXXXXXX12PEN;45;45;1;60;X10MUSTERI;1;1;1;1;906;11;0;XXXXXXXXXX16BAYI",
@@ -53,13 +35,52 @@
     "10;1806;XXXXXXX12PEN;90;45;1;60;X10MUSTERI;200;2;2;20;1506;2;9;XXXXXXXXXX16BAYI",
     "13;1200;XXXXXXX12PEN;90;45;1;60;X10MUSTERI;60;1;5;100;1000;1;12;XXXXXXXXXX16BAYI"
   ];
-
   var ISLEM_TR = ["iSLEM YOK", "SU TAHLiYE", "KOL YERi", "MENTESE", "C.ACILIM", "T. A. SOL", "T. A. SAG", "C. A. SOL",
     "C. A. SAG", "V. A. SOL", "SAG A.KAPI", "SOL A.KAPI", "VASISTAS"];
   var ISLEM_EN = ["NO OPERAT.", "WATER SLOT", "HANDLE", "HINGE", "D.OPENING", "S. O. LEFT", "S. O. RIGHT", "D. O. LEFT",
     "D. O. RIGHT", "V. O. LEFT", "RIGHT O.DOOR", "LEFT O.DOOR", "VASISTAS"];
   var LOC_TR = ["()", "UST(Y)", "SAG(X)", "ALT(Y)", "SOL(X)"];
   var LOC_EN = ["()", "UP(Y)", "RGT(X)", "BOT(Y)", "LFT(X)"];
+
+  /* ---------- Settings state (one per machine, like the PLC's retained values) ---------- */
+  function emptyMachine(n) {
+    var t = {};
+    for (var i = 0; i < n; i++) t[i] = { enable: 0, p1: 0, p2: 0, p3: 0, p4: 1, p5: 1, p6: 1, p7: 0 };
+    return { text: t, bc: { p1: 0, p2: 0, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 0 },
+      bcid: { p1: 0, p2: 0, p3: 0, p4: 6, p5: 2, p6: 2, p7: 40, p8: 0 },
+      label: { Dp1: 10, Qp1: 160, qp1: 840, Qp2: 24, Rp1: 0, Rp2: 0, Sp1: 3, Zp1: 0 },
+      design: 0, second: 0, size25: 0 };
+  }
+  function assign(dst, src) { Object.keys(src).forEach(function (k) { dst[k] = src[k]; }); }
+  /* DefaultDataFromSW: TT405 */
+  function loadTT405(st) {
+    var src = DEF[st.size25 ? "tt405_103x25" : "tt405_103x20"];
+    Object.keys(src.text).forEach(function (k) { assign(st.text[k], src.text[k]); });
+    assign(st.bc, src.bc); assign(st.bcid, src.bcid); assign(st.label, src.label);
+    for (var i = 0; i <= 13; i++) st.text[i].enable = 1;
+    if (st.design === 2) {
+      Object.keys(DEF.tt405_d2.text).forEach(function (k) { assign(st.text[k], DEF.tt405_d2.text[k]); });
+      assign(st.bc, DEF.tt405_d2.bc);
+      for (var j = 0; j <= 14; j++) st.text[j].enable = 1;
+    }
+  }
+  /* DefaultDataFromSW: MS300 */
+  function loadMS300(st) {
+    Object.keys(DEF.ms300.text).forEach(function (k) { assign(st.text[k], DEF.ms300.text[k]); });
+    assign(st.bc, DEF.ms300.bc); assign(st.label, DEF.ms300.label);
+    for (var i = 0; i <= 13; i++) st.text[i].enable = 1;
+  }
+  function freshState() {
+    var s = { machine: "ms300", tab: 0, line: 0, lang: EN ? "en" : "tr", tol: 0, angle: 1, row: SAMPLES[0],
+      tt405: emptyMachine(15), ms300: emptyMachine(14) };
+    loadTT405(s.tt405); loadMS300(s.ms300);
+    return s;
+  }
+  var KEY = "br-cutlist-label-v2";
+  var state;
+  try { state = JSON.parse(window.localStorage.getItem(KEY)); } catch (e) { state = null; }
+  if (!state || !state.tt405 || !state.ms300) state = freshState();
+  function save() { try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ } }
 
   /* ---------- PLC string helpers ---------- */
   function num(v) { var n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? 0 : n; }
@@ -69,8 +90,7 @@
   function padL(s, n, c) { s = String(s); while (s.length < n) s = c + s; return s; }
   function padR(s, n, c) { s = String(s); while (s.length < n) s = s + c; return s; }
   function dig(x) {                                                            // ExtractNumber6dig
-    var f = function (v) { return Math.floor(v); };
-    var i = f(x);
+    var f = Math.floor, i = f(x);
     return { 7: f((i % 100000) / 10000), 6: f((i % 10000) / 1000), 5: f((i % 1000) / 100), 4: f((i % 100) / 10),
       3: i % 10, 2: f(x * 10) % 10, 1: f(x * 100) % 10 };
   }
@@ -86,9 +106,18 @@
       dealer: c[15] };
   }
 
-  /* ---------- Label content ---------- */
-  function buildTT405(r, o) {
-    var tr = o.lang === "tr", d = o.design, tol = o.tol;
+  function aCmd(f, s) { return "A" + [f.p1, f.p2, f.p3, f.p4, f.p5, f.p6, f.p7 ? "R" : "N"].join(",") + ',"' + s + '"'; }
+  function bCmd(b) { return "B" + [b.p1, b.p2, b.p3, BC_TYPES[b.p4] || "", b.p5, b.p6, b.p7, b.p8 ? "B" : "N"].join(",") + ","; }
+  function header(st, tt) {
+    var l = st.label, out = tt ? [""] : [];
+    out.push("N", "Y38,N,8,1", "Q" + l.Qp1 + "," + l.Qp2 + ",", "q" + l.qp1, "R" + l.Rp1 + "," + l.Rp2, "S" + l.Sp1, "OD",
+      (tt ? "D" : "S") + l.Dp1);
+    return out;
+  }
+
+  /* ---------- PrepareDataPrint: TT405 ---------- */
+  function buildTT405(r, o, st) {
+    var tr = o.lang === "tr", d = st.design, tol = o.tol;
     var g = {
       prog: left(String(r.prog), 4), cart: right(String(r.cart), 1), pos: String(r.pos),
       x: left(r2s(r.len - tol), 7), y: left(r2s(r.other - tol), 7), lenS: r2s(r.len), otherS: r2s(r.other),
@@ -96,14 +125,12 @@
       dealer: left(r.dealer, d === 3 ? 20 : 16), width: ""
     };
     if (d === 2) { g.width = left(r2s(r.height), 3); g.loc = right(g.loc, 2); }
-    var islem = (tr ? ISLEM_TR : ISLEM_EN)[r.islem] || "";
-    var loc = (tr ? LOC_TR : LOC_EN)[r.frame] || "";
     var t = {};
     t[0] = "LOGO";
     t[1] = (d === 2 ? (tr ? "SIPARIS NO:" : "ORDER NO:") : "PROG NO:") + g.prog;
     t[2] = (tr ? "ARABA NO:" : "CAR NO:") + g.cart;
-    t[3] = islem;
-    t[4] = loc;
+    t[3] = (tr ? ISLEM_TR : ISLEM_EN)[r.islem] || "";
+    t[4] = (tr ? LOC_TR : LOC_EN)[r.frame] || "";
     if (d === 2) t[5] = (tr ? "KALIP FARKI:" : "MOLD DIFFERENCE:") + g.loc + "mm";
     else if (d === 3) t[5] = (tr ? "YER NO:" : "BIN NO:") + g.loc;
     else t[5] = (tr ? "YER NO:" : "LOC NO:") + g.loc;
@@ -116,7 +143,7 @@
     t[11] = (tr ? "MUSTERI:" : "CLIENT:") + g.customer;
     t[14] = d === 2 ? (tr ? "PROFIL KALINLIGI:" : "PROFILE WIDTH:") + g.width + "mm" : (tr ? "YUKSEKLIK:" : "HEIGHT:") + "mm";
 
-    var bc, parts;
+    var parts;
     if (d === 1) {
       parts = [["K", T("Sabit", "Fixed")], [padL(g.prog, 4, "0"), T("Kesim no (4)", "Cut no (4)")],
         [padL(right(g.pos, 2), 2, "0"), T("Poz no (2)", "Pos no (2)")], [g.cart, T("Araba no (1)", "Cart no (1)")],
@@ -139,36 +166,27 @@
         [digits(r.len - tol, D6), T("Uzunluk − kaynak payı (6, 0,01 mm)", "Length − weld allowance (6, 0.01 mm)")],
         [digits(r.other - tol, D6), T("Diğer eksen − kaynak payı (6, 0,01 mm)", "Other axis − weld allowance (6, 0.01 mm)")]];
     }
-    bc = parts.map(function (p) { return p[0]; }).join("");
-
-    var size = LAYOUTS[o.size], lay = JSON.parse(JSON.stringify(size));
-    var enabled = {};
-    for (var i = 0; i <= 11; i++) enabled[i] = true;
-    if (d === 2) {
-      var ov = LAYOUTS.tt405_design2;
-      Object.keys(ov.text).forEach(function (k) { lay.text[k] = ov.text[k]; });
-      lay.bc = ov.bc; enabled[14] = true;
-    }
-    var lines = ["", "N", "Y38,N,8,1", "Q" + lay.label.Q1 + "," + lay.label.Q2 + ",", "q" + lay.label.q,
-      "R" + lay.label.R1 + "," + lay.label.R2, "S" + lay.label.S, "OD", "D" + lay.label.D];
-    var texts = [];
+    var bc = parts.map(function (p) { return p[0]; }).join("");
+    var lines = header(st, true), texts = [];
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14].forEach(function (k) {
-      if (!enabled[k]) return;
-      texts.push({ idx: k, f: lay.text[k], s: t[k] });
-      lines.push(aCmd(lay.text[k], t[k]));
+      if (!st.text[k].enable) return;
+      texts.push({ idx: k, f: st.text[k], s: t[k] });
+      lines.push(aCmd(st.text[k], t[k]));
     });
-    var barcodes = [{ b: lay.bc, data: bc }];
-    lines.push(bCmd(lay.bc) + '"' + bc + '"');
-    if (o.second) {
-      var id = padL(g.prog, 4, "0");
-      lines.push(bCmd(lay.bcid) + '"' + id + '"');
-      barcodes.push({ b: lay.bcid, data: id });
+    lines.push(bCmd(st.bc) + '"' + bc + '"');
+    var barcodes = [{ b: st.bc, data: bc, idx: "bc" }];
+    if (st.second) {
+      var id = padL(g.prog, 4, "0"), b2 = { p1: st.bcid.p1, p2: st.bcid.p2, p3: st.bc.p3, p4: st.bc.p4, p5: st.bc.p5,
+        p6: st.bc.p6, p7: st.bcid.p7, p8: st.bc.p8 };
+      lines.push(bCmd(b2) + '"' + id + '"');
+      barcodes.push({ b: b2, data: id, idx: "bc2" });
     }
-    lines.push("Z" + (lay.label.Z ? "B" : "T"), "P1");
-    return { lines: lines, texts: texts, barcodes: barcodes, parts: parts, label: lay.label, allText: t };
+    lines.push("Z" + (st.label.Zp1 ? "B" : "T"), "P1");
+    return { lines: lines, texts: texts, barcodes: barcodes, parts: parts };
   }
 
-  function buildMS300(r, o) {
+  /* ---------- PrepareDataPrint: MS300 ---------- */
+  function buildMS300(r, o, st) {
     var tol = o.tol;
     var g = {
       prog: left(String(r.prog), 4), cart: left(String(r.cart), 9), pos: String(r.pos),
@@ -194,17 +212,15 @@
       [digits(r.len - tol, D6), T("Uzunluk − kaynak payı (6, 0,01 mm)", "Length − weld allowance (6, 0.01 mm)")],
       [digits(r.height - tol, D6), T("Yükseklik − kaynak payı (6, 0,01 mm)", "Height − weld allowance (6, 0.01 mm)")]];
     var bc = parts.map(function (p) { return p[0]; }).join("");
-    var lay = LAYOUTS.ms300;
-    var lines = ["N", "Y38,N,8,1", "Q" + lay.label.Q1 + "," + lay.label.Q2 + ",", "q" + lay.label.q,
-      "R" + lay.label.R1 + "," + lay.label.R2, "S" + lay.label.S, "OD", "S" + lay.label.D];
-    var texts = [];
-    for (var k = 0; k <= 11; k++) { texts.push({ idx: k, f: lay.text[k], s: t[k] }); lines.push(aCmd(lay.text[k], t[k])); }
-    lines.push(bCmd(lay.bc) + '"' + bc + '"', "P1");
-    return { lines: lines, texts: texts, barcodes: [{ b: lay.bc, data: bc }], parts: parts, label: lay.label, allText: t };
+    var lines = header(st, false), texts = [];
+    for (var k = 0; k <= 11; k++) {
+      if (!st.text[k].enable) continue;
+      texts.push({ idx: k, f: st.text[k], s: t[k] });
+      lines.push(aCmd(st.text[k], t[k]));
+    }
+    lines.push(bCmd(st.bc) + '"' + bc + '"', "P1");
+    return { lines: lines, texts: texts, barcodes: [{ b: st.bc, data: bc, idx: "bc" }], parts: parts };
   }
-
-  function aCmd(f, s) { return "A" + [f.p1, f.p2, f.p3, f.p4, f.p5, f.p6, f.p7 ? "R" : "N"].join(",") + ',"' + s + '"'; }
-  function bCmd(b) { return "B" + [b.p1, b.p2, b.p3, BC_TYPES[b.p4], b.p5, b.p6, b.p7, b.p8 ? "B" : "N"].join(",") + ","; }
 
   /* ---------- Code 128 (subset B) for the preview ---------- */
   var C128 = ["212222","222122","222221","121223","121322","131222","122213","122312","132212","221213","221312","231212",
@@ -236,110 +252,258 @@
     if (parent) parent.appendChild(e);
     return e;
   }
-  function draw(svg, res) {
+  function box(x, y, w, h, rot) {                    // bounding box after rotation about (x, y)
+    var c = [[0, 0], [w, 0], [0, h], [w, h]], a = rot * Math.PI / 180, xs = [], ys = [];
+    c.forEach(function (p) { xs.push(x + p[0] * Math.cos(a) - p[1] * Math.sin(a)); ys.push(y + p[0] * Math.sin(a) + p[1] * Math.cos(a)); });
+    return { x0: Math.min.apply(null, xs), x1: Math.max.apply(null, xs), y0: Math.min.apply(null, ys), y1: Math.max.apply(null, ys) };
+  }
+  function draw(svg, res, st, onPick) {
     while (svg.firstChild) svg.removeChild(svg.firstChild);
-    var lab = res.label, ox = lab.R1, oy = lab.R2, W = lab.q, H = lab.Q1, maxY = 0;
-    var g = el("g", {}, null);
+    var lab = st.label, ox = lab.Rp1, oy = lab.Rp2, W = Math.max(lab.qp1, 10), H = Math.max(lab.Qp1, 10);
+    var minX = 0, minY = 0, maxX = W, maxY = H;
+    var g = el("g", {}, null), sel = null;
+    function grow(b) { minX = Math.min(minX, b.x0); minY = Math.min(minY, b.y0); maxX = Math.max(maxX, b.x1); maxY = Math.max(maxY, b.y1); }
     res.texts.forEach(function (t) {
-      var f = t.f, fs = FONTS[f.p4] || FONTS[2], pitch = fs[0] * f.p5, h = fs[1] * f.p6, len = Math.max(1, t.s.length);
-      var w = pitch * len, x = f.p1 + ox, y = f.p2 + oy, rot = (f.p3 || 0) * 90;
-      var grp = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ")" }, g);
-      if (f.p7) el("rect", { x: 0, y: 0, width: w, height: h, "class": "lt-rev" }, grp);
+      var f = t.f, fs = FONTS[f.p4] || FONTS[2], pitch = fs[0] * Math.max(1, f.p5), h = fs[1] * Math.max(1, f.p6);
+      var w = pitch * Math.max(1, t.s.length), x = f.p1 + ox, y = f.p2 + oy, rot = (f.p3 % 4) * 90;
+      var grp = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ")", "class": "lt-item", "data-idx": t.idx }, g);
+      el("rect", { x: 0, y: 0, width: w, height: h, "class": f.p7 ? "lt-rev" : "lt-hit" }, grp);
       var txt = el("text", { x: 0, y: h * 0.82, "font-size": h * 0.95, textLength: w, lengthAdjust: "spacingAndGlyphs",
         "class": f.p7 ? "lt-txt lt-txt--rev" : "lt-txt" }, grp);
       txt.textContent = t.s;
-      var tip = el("title", {}, grp); tip.textContent = T("Satır ", "Line ") + t.idx + ": " + t.s;
-      var bottom = rot === 90 || rot === 270 ? y + w : y + h;
-      if (bottom > maxY) maxY = bottom;
+      el("title", {}, grp).textContent = LINE_NAMES[t.idx] + ": " + t.s;
+      if (state.tab === 0 && t.idx === state.line) sel = { x: x, y: y, w: w, h: h, rot: rot };
+      grp.addEventListener("click", function () { onPick(0, t.idx); });
+      grow(box(x, y, w, h, rot));
     });
     res.barcodes.forEach(function (b) {
-      var p = b.b, x = p.p1 + ox, y = p.p2 + oy, mod = p.p5, h = p.p7, pattern = code128B(b.data), cx = x, bar = true;
+      var p = b.b, x = p.p1 + ox, y = p.p2 + oy, mod = Math.max(1, p.p5), h = Math.max(1, p.p7), rot = (p.p3 % 4) * 90;
+      var grp = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ")", "class": "lt-item" }, g);
+      var pattern = code128B(b.data), cx = 0, bar = true;
       for (var i = 0; i < pattern.length; i++) {
         var wdt = parseInt(pattern[i], 10) * mod;
-        if (bar) el("rect", { x: cx, y: y, width: wdt, height: h, "class": "lt-bar" }, g);
+        if (bar) el("rect", { x: cx, y: 0, width: wdt, height: h, "class": "lt-bar" }, grp);
         cx += wdt; bar = !bar;
       }
-      var bottom = y + h;
+      var hh = h;
       if (p.p8) {
-        var hr = el("text", { x: x, y: y + h + 14, "font-size": 14, textLength: cx - x, lengthAdjust: "spacingAndGlyphs", "class": "lt-txt" }, g);
-        hr.textContent = b.data; bottom += 18;
+        el("text", { x: 0, y: h + 14, "font-size": 14, textLength: cx, lengthAdjust: "spacingAndGlyphs", "class": "lt-txt" }, grp).textContent = b.data;
+        hh += 18;
       }
-      if (bottom > maxY) maxY = bottom;
-      if (cx > W) W = cx + 10;
+      el("rect", { x: 0, y: 0, width: cx, height: hh, "class": "lt-hit" }, grp);
+      el("title", {}, grp).textContent = T("Barkod: ", "Barcode: ") + b.data;
+      if (state.tab === 1 && b.idx === "bc") sel = { x: x, y: y, w: cx, h: hh, rot: rot };
+      grp.addEventListener("click", function () { onPick(1); });
+      grow(box(x, y, cx, hh, rot));
     });
-    var vbH = maxY > H ? maxY + 6 : H;
-    svg.setAttribute("viewBox", "-4 -4 " + (W + 8) + " " + (vbH + 8));
-    el("rect", { x: 0, y: 0, width: lab.q, height: H, "class": "lt-label" }, svg);
-    if (vbH > H) el("rect", { x: 0, y: H, width: lab.q, height: vbH - H, "class": "lt-overflow" }, svg);
+    var pad = 6, vx = Math.floor(minX) - pad, vy = Math.floor(minY) - pad, vw = Math.ceil(maxX - minX) + 2 * pad, vh = Math.ceil(maxY - minY) + 2 * pad;
+    svg.setAttribute("viewBox", vx + " " + vy + " " + vw + " " + vh);
+    el("rect", { x: vx, y: vy, width: vw, height: vh, "class": "lt-overflow" }, svg);
+    el("rect", { x: 0, y: 0, width: W, height: H, "class": "lt-label" }, svg);
     svg.appendChild(g);
+    if (sel) el("rect", { x: -3, y: -3, width: sel.w + 6, height: sel.h + 6, "class": "lt-sel",
+      transform: "translate(" + sel.x + " " + sel.y + ") rotate(" + sel.rot + ")" }, svg);
+    return maxX > W || maxY > H || minX < 0 || minY < 0;
   }
 
-  /* ---------- UI ---------- */
-  function field(label, control) {
-    var w = document.createElement("label"); w.className = "lt-field";
-    var s = document.createElement("span"); s.textContent = label; w.appendChild(s); w.appendChild(control); return w;
+  /* ---------- UI helpers ---------- */
+  function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function field(label, control, note) {
+    var w = mk("label", "lt-field"); w.appendChild(mk("span", null, label)); w.appendChild(control);
+    if (note) w.appendChild(mk("small", "lt-note", note));
+    return w;
   }
   function select(opts, value) {
     var s = document.createElement("select");
     opts.forEach(function (o) { var e = document.createElement("option"); e.value = o[0]; e.textContent = o[1]; s.appendChild(e); });
-    s.value = value; return s;
+    s.value = String(value); return s;
   }
-  function input(type, value) { var i = document.createElement("input"); i.type = type; i.value = value; return i; }
+  function numInput(value, min, max) {
+    var i = document.createElement("input"); i.type = "number"; i.inputMode = "numeric"; i.step = "1";
+    i.min = min; i.max = max; i.value = value; return i;
+  }
+  function clampInt(v, min, max) { var n = Math.round(num(v)); return Math.min(max, Math.max(min, n)); }
+  var NOYES = [["0", T("Hayır", "No")], ["1", T("Evet", "Yes")]];
+  var ROT = [["0", "Normal"], ["1", "90"], ["2", "180"], ["3", "270"]];
+  var FONT_OPTS = [["1", "4pts"], ["2", "6pts"], ["3", "8pts"], ["4", "10pts"], ["5", "21pts"]];
+  var SPEED = [["1", "37 mm/s"], ["2", "50 mm/s"], ["3", "63 mm/s"], ["4", "83 mm/s"]];
 
-  var machine = select([["tt405", "TT405"], ["ms300", "MS300"]], "tt405");
-  var design = select([["0", T("0 - Standart barkod", "0 - Standard barcode")], ["1", T("1 - Barkod 1", "1 - Barcode 1")],
-    ["2", T("2 - Barkod 2", "2 - Barcode 2")], ["3", T("3 - Barkod 3", "3 - Barcode 3")], ["4", T("4 - Barkod 4", "4 - Barcode 4")]], "0");
-  var size = select([["tt405_103x20", "103x20"], ["tt405_103x25", "103x25"]], "tt405_103x20");
-  var lang = select([["tr", T("Türkçe", "Turkish")], ["en", T("İngilizce", "English")]], EN ? "en" : "tr");
-  var second = select([["0", T("Pasif", "Passive")], ["1", T("Aktif", "Active")]], "0");
-  var angle = select([["0", T("Yok", "Off")], ["1", T("Var (yeni sürüm)", "On (new version)")]], "0");
-  var tol = input("number", "0"); tol.step = "0.1";
-  var sample = select(SAMPLES.map(function (s, i) { return [String(i), T("Örnek ", "Sample ") + s.split(";")[0]]; }), "0");
-  var row = input("text", SAMPLES[0]); row.className = "lt-row"; row.spellcheck = false;
-
-  var form = document.createElement("div"); form.className = "lt-form";
-  var fDesign = field(T("Barkod tasarım no", "Barcode design no"), design);
-  var fSize = field(T("Etiket boyutu", "Label size"), size);
-  var fLang = field(T("Dil", "Language"), lang);
-  var fSecond = field(T("2. barkod", "2nd barcode"), second);
-  var fAngle = field(T("Açı eki (konum satırı)", "Angle suffix (location line)"), angle);
-  [field(T("Makine", "Machine"), machine), fDesign, fSize, fLang, fSecond, fAngle,
-    field(T("Kaynak payı (mm)", "Weld allowance (mm)"), tol), field(T("Örnek satır", "Sample row"), sample)].forEach(function (f) { form.appendChild(f); });
-  var fRow = field(T("Kesim listesi satırı (16 alan, ; ile)", "Cut list row (16 fields, ; separated)"), row); fRow.classList.add("lt-field--wide");
-  form.appendChild(fRow);
+  /* ---------- Layout ---------- */
+  var data = mk("div", "lt-form");
+  var hmi = mk("div", "lt-hmi");
+  var tabs = mk("div", "lt-tabs");
+  tabs.setAttribute("role", "tablist");
+  var panel = mk("div", "lt-panel");
+  hmi.appendChild(mk("div", "lt-hmi__title", T("Yazıcı Ayarı sayfası", "Printer Settings page")));
+  hmi.appendChild(tabs); hmi.appendChild(panel);
 
   var svg = document.createElementNS(NS, "svg"); svg.setAttribute("class", "lt-svg"); svg.setAttribute("role", "img");
   svg.setAttribute("aria-label", T("Etiket önizlemesi", "Label preview"));
-  var prevBox = document.createElement("figure"); prevBox.className = "lt-preview"; prevBox.appendChild(svg);
-  var cap = document.createElement("figcaption");
-  cap.textContent = T("Yaklaşık önizleme (203 dpi, 1 nokta = 0,125 mm). Kırmızı alan etiket boyunu aşan kısımdır.",
-    "Approximate preview (203 dpi, 1 dot = 0.125 mm). The red area is outside the label length.");
-  prevBox.appendChild(cap);
+  var prevBox = mk("figure", "lt-preview"); prevBox.appendChild(svg);
+  var cap = mk("figcaption"); prevBox.appendChild(cap);
+  var bcTable = mk("table", "lt-table");
+  var bcWrap = mk("div", "lt-scroll"); bcWrap.appendChild(bcTable);
+  var pre = mk("pre", "lt-epl");
+  var copy = mk("button", "lt-btn", T("Komutları kopyala", "Copy commands")); copy.type = "button";
 
-  var bcTable = document.createElement("table"); bcTable.className = "lt-table";
-  var pre = document.createElement("pre"); pre.className = "lt-epl";
-  var copy = document.createElement("button"); copy.type = "button"; copy.className = "lt-copy"; copy.textContent = T("Komutları kopyala", "Copy commands");
-
-  function h3(text) { var h = document.createElement("h3"); h.textContent = text; return h; }
-  root.appendChild(form);
-  root.appendChild(h3(T("Önizleme", "Preview")));
+  root.appendChild(mk("h3", null, T("Kesim verisi", "Cut data")));
+  root.appendChild(data);
+  root.appendChild(mk("h3", null, T("Ayarlar", "Settings")));
+  root.appendChild(hmi);
+  root.appendChild(mk("h3", null, T("Önizleme", "Preview")));
   root.appendChild(prevBox);
-  root.appendChild(h3(T("Barkod içeriği", "Barcode content")));
-  root.appendChild(bcTable);
-  root.appendChild(h3(T("Yazıcıya giden komutlar", "Commands sent to the printer")));
+  root.appendChild(mk("h3", null, T("Barkod içeriği", "Barcode content")));
+  root.appendChild(bcWrap);
+  root.appendChild(mk("h3", null, T("Yazıcıya giden komutlar", "Commands sent to the printer")));
   root.appendChild(copy);
   root.appendChild(pre);
 
+  function st() { return state[state.machine]; }
+
+  function buildData() {
+    data.innerHTML = "";
+    var tt = state.machine === "tt405";
+    var machine = select([["ms300", "MS300"], ["tt405", "TT405"]], state.machine);
+    machine.addEventListener("change", function () { state.machine = machine.value; if (state.line > 11 && state.machine === "ms300") state.line = 0; refresh(true); });
+    data.appendChild(field(T("Makine", "Machine"), machine));
+    if (tt) {
+      var lang = select([["tr", T("Türkçe", "Turkish")], ["en", T("İngilizce", "English")]], state.lang);
+      lang.addEventListener("change", function () { state.lang = lang.value; refresh(); });
+      data.appendChild(field(T("Makine dili", "Machine language"), lang));
+    } else {
+      var angle = select([["1", T("Var (yeni sürüm)", "On (new version)")], ["0", T("Yok (eski sürüm)", "Off (old version)")]], state.angle);
+      angle.addEventListener("change", function () { state.angle = parseInt(angle.value, 10); refresh(); });
+      data.appendChild(field(T("Açı eki", "Angle suffix"), angle));
+    }
+    var tol = numInput(state.tol, -99, 99); tol.step = "0.1";
+    tol.addEventListener("input", function () { state.tol = num(tol.value); refresh(); });
+    data.appendChild(field(T("Kaynak payı (mm)", "Weld allowance (mm)"), tol));
+    var sample = select([["", "—"]].concat(SAMPLES.map(function (s, i) { return [String(i), T("Örnek ", "Sample ") + s.split(";")[0]]; })),
+      SAMPLES.indexOf(state.row) >= 0 ? SAMPLES.indexOf(state.row) : "");
+    data.appendChild(field(T("Örnek satır", "Sample row"), sample));
+    var row = document.createElement("input"); row.type = "text"; row.className = "lt-row"; row.spellcheck = false; row.value = state.row;
+    row.addEventListener("input", function () { state.row = row.value; sample.value = SAMPLES.indexOf(row.value) >= 0 ? String(SAMPLES.indexOf(row.value)) : ""; refresh(); });
+    sample.addEventListener("change", function () { if (sample.value === "") return; row.value = state.row = SAMPLES[parseInt(sample.value, 10)]; refresh(); });
+    var wide = field(T("Kesim listesi satırı (16 alan, ; ile)", "Cut list row (16 fields, ; separated)"), row);
+    wide.classList.add("lt-field--wide");
+    data.appendChild(wide);
+  }
+
+  function bindNum(obj, key, min, max, label, note) {
+    var i = numInput(obj[key], min, max);
+    i.addEventListener("input", function () { if (i.value === "" || i.value === "-") return; obj[key] = clampInt(i.value, min, max); refresh(); });
+    i.addEventListener("change", function () { obj[key] = clampInt(i.value, min, max); i.value = obj[key]; refresh(); });
+    return field(label, i, note);
+  }
+  function bindSel(obj, key, opts, label, note, after) {
+    var s = select(opts, obj[key]);
+    s.addEventListener("change", function () { obj[key] = parseInt(s.value, 10); if (after) after(); refresh(after ? true : false); });
+    return field(label, s, note);
+  }
+
+  function buildTabs() {
+    tabs.innerHTML = "";
+    [T("Yazı", "Text"), T("Barkod", "Barcode"), T("Etiket", "Label"), T("Yazıcı Ayarı", "Printer")].forEach(function (name, i) {
+      var b = mk("button", "lt-tab" + (state.tab === i ? " is-active" : ""), name); b.type = "button";
+      b.setAttribute("role", "tab"); b.setAttribute("aria-selected", state.tab === i ? "true" : "false");
+      b.addEventListener("click", function () { state.tab = i; refresh(true); });
+      tabs.appendChild(b);
+    });
+  }
+
+  function buildPanel() {
+    panel.innerHTML = "";
+    var s = st(), tt = state.machine === "tt405", grid = mk("div", "lt-grid");
+    if (state.tab === 0) {
+      var max = tt ? 14 : 13, opts = [];
+      for (var i = 0; i <= max; i++) opts.push([String(i), LINE_NAMES[i] + (i === 12 || i === 13 ? T(" (manuel baskı)", " (manual print)") : "")]);
+      var lineSel = select(opts, state.line);
+      lineSel.addEventListener("change", function () { state.line = parseInt(lineSel.value, 10); refresh(true); });
+      grid.appendChild(field(T("Yazı", "Text"), lineSel));
+      var f = s.text[state.line];
+      grid.appendChild(bindSel(f, "enable", NOYES, T("Aktif", "Enable")));
+      grid.appendChild(mk("span", "lt-gap"));
+      grid.appendChild(bindNum(f, "p1", -32768, 32767, T("Yatay Başl.", "Horiz. start")));
+      grid.appendChild(bindNum(f, "p2", -32768, 32767, T("Dikey Başl.", "Vert. start")));
+      grid.appendChild(bindSel(f, "p4", FONT_OPTS, "Font"));
+      grid.appendChild(bindNum(f, "p5", 1, 255, T("Yatay Çarpan", "Horiz. multiplier")));
+      grid.appendChild(bindNum(f, "p6", 1, 255, T("Dikey Çarpan", "Vert. multiplier")));
+      grid.appendChild(bindSel(f, "p7", NOYES, T("Ters", "Reverse")));
+      grid.appendChild(bindSel(f, "p3", ROT, T("Yön", "Rotation")));
+      if (state.line === 12 || state.line === 13) panel.appendChild(mk("p", "lt-hint", T("Bu satır yalnız manuel barkod sayfasından basılan etikette kullanılır; iş dosyası etiketinde yoktur.",
+        "This line is only used on labels printed from the manual barcode page, not on job file labels.")));
+      if (!tt && state.line > 11) { /* nothing more */ }
+    } else if (state.tab === 1) {
+      var swapped = !tt ? T("Panelde \"Çizgi Genişliği\" yazar", "Labelled \"Narrow bar width\" on the panel") : null;
+      var swapped2 = !tt ? T("Panelde \"Dikey Başl.\" yazar", "Labelled \"Vert. start\" on the panel") : null;
+      grid.appendChild(bindNum(s.bc, "p1", -32768, 32767, T("Yatay Başl.", "Horiz. start")));
+      grid.appendChild(bindNum(s.bc, "p2", -32768, 32767, T("Dikey Başl.", "Vert. start"), swapped));
+      grid.appendChild(bindSel(s.bc, "p8", NOYES, T("Okunabilir Kod", "Human code")));
+      grid.appendChild(bindNum(s.bc, "p6", 0, 255, T("Barkod Genişliği", "Wide bar width")));
+      grid.appendChild(bindNum(s.bc, "p5", 1, 255, T("Çizgi Genişliği", "Narrow bar width"), swapped2));
+      grid.appendChild(bindSel(s.bc, "p3", ROT, T("Yön", "Rotation")));
+      grid.appendChild(bindNum(s.bc, "p7", 1, 999, T("Yükseklik", "Height")));
+      var types = BC_NAMES.map(function (n, i) { return [String(i), n]; });
+      var tf = bindSel(s.bc, "p4", types, T("Tip", "Type")); tf.classList.add("lt-field--span2");
+      grid.appendChild(tf);
+      if (tt) {
+        grid.appendChild(bindSel(s, "design", [["0", T("0 - Standart barkod", "0 - Standard barcode")], ["1", T("1 - Barkod 1", "1 - Barcode 1")],
+          ["2", T("2 - Barkod 2", "2 - Barcode 2")], ["3", T("3 - Barkod 3", "3 - Barcode 3")], ["4", T("4 - Barkod 4", "4 - Barcode 4")]],
+          T("Barkod tasarım no", "Barcode design no"), T("Konumlar için ön ayarları yeniden yükleyin", "Reload the preset for its positions")));
+        grid.appendChild(bindSel(s, "second", [["0", T("Pasif", "Passive")], ["1", T("Aktif", "Active")]], T("2. barkod", "2nd barcode")));
+      }
+      if (s.bc.p4 !== 6) panel.appendChild(mk("p", "lt-hint", T("Önizleme barkodu her tipte Code 128 B olarak çizer; komut seçilen tiple gider.",
+        "The preview always draws Code 128 B; the command uses the selected type.")));
+    } else if (state.tab === 2) {
+      grid.appendChild(bindNum(s.label, "Qp1", 1, 65535, T("Etiket Boyu", "Label length")));
+      grid.appendChild(bindNum(s.label, "qp1", 1, 65535, T("Etiket Genişliği", "Label width")));
+      grid.appendChild(bindNum(s.label, "Qp2", 0, 65535, T("Boşluk Boyu", "Gap length")));
+      grid.appendChild(bindNum(s.label, "Rp1", -32768, 32767, T("Yatay Başl.", "Horiz. margin")));
+      grid.appendChild(bindNum(s.label, "Rp2", -32768, 32767, T("Dikey Başl.", "Vert. margin")));
+      grid.appendChild(bindNum(s.label, "Dp1", 0, 255, T("Koyuluk", "Density")));
+      grid.appendChild(bindSel(s.label, "Sp1", SPEED, T("Hız", "Speed")));
+      grid.appendChild(bindSel(s.label, "Zp1", [["0", "T"], ["1", "B"]], T("Yön", "Direction"), tt ? null : T("MS300 bu değeri göndermez", "MS300 does not send this value")));
+      if (tt) grid.appendChild(bindSel(s, "size25", [["0", "103x20"], ["1", "103x25"]], T("Etiket Boyutu", "Label size"),
+        T("Ön ayar yüklemesinde kullanılır", "Used when loading the preset")));
+    } else {
+      var load = mk("button", "lt-btn lt-btn--big", tt ? T("Ön Ayarlı Parametreleri Yükle", "Load SW Format") : T("Default Barkod Ayarlarını Yükle", "Load SW Format"));
+      load.type = "button";
+      load.addEventListener("click", function () {
+        if (tt) loadTT405(s); else loadMS300(s);
+        state.line = 0; refresh(true);
+        load.textContent = T("Yüklendi", "Loaded");
+      });
+      panel.appendChild(load);
+      panel.appendChild(mk("p", "lt-hint", tt
+        ? T("PLC'nin ön ayarlarını, seçili etiket boyutu ve barkod tasarım numarasına göre yükler. Panelde olduğu gibi Poz No satırının yönü değişmez.",
+          "Loads the PLC preset for the selected label size and barcode design number. As on the panel, the rotation of the Poz No line is not changed.")
+        : T("PLC'nin ön ayarlarını yükler. Panelde olduğu gibi Poz No satırının yönü değişmez.",
+          "Loads the PLC preset. As on the panel, the rotation of the Poz No line is not changed.")));
+      var reset = mk("button", "lt-btn", T("Sayfayı ilk haline getir", "Reset this page")); reset.type = "button";
+      reset.addEventListener("click", function () { state = freshState(); refresh(true); });
+      panel.appendChild(reset);
+      panel.appendChild(mk("p", "lt-hint", T("Değişiklikler bu tarayıcıda saklanır.", "Changes are kept in this browser.")));
+      return;
+    }
+    panel.appendChild(grid);
+  }
+
+  function pick(tab, line) {
+    state.tab = tab;
+    if (tab === 0) state.line = line;
+    refresh(true);
+    hmi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
   var last = "";
-  function update() {
-    var tt = machine.value === "tt405";
-    [fDesign, fSize, fLang, fSecond].forEach(function (f) { f.hidden = !tt; });
-    fAngle.hidden = tt;
-    var r = parseRow(row.value);
-    var o = { design: parseInt(design.value, 10), size: size.value, lang: lang.value, second: second.value === "1",
-      angle: angle.value === "1", tol: num(tol.value) };
-    var res = tt ? buildTT405(r, o) : buildMS300(r, o);
-    draw(svg, res);
+  function render() {
+    var s = st(), tt = state.machine === "tt405";
+    var r = parseRow(state.row), o = { lang: state.lang, tol: state.tol, angle: state.angle };
+    var res = tt ? buildTT405(r, o, s) : buildMS300(r, o, s);
+    var over = draw(svg, res, s, pick);
+    cap.textContent = T("Yaklaşık önizleme (203 dpi, 1 nokta = 0,125 mm). Bir yazıya veya barkoda tıklayınca ayarı açılır.",
+      "Approximate preview (203 dpi, 1 dot = 0.125 mm). Click a text or the barcode to open its settings.") +
+      (over ? T(" Kırmızı alan etiketin dışında kalan kısımdır.", " The red area is outside the label.") : "");
     bcTable.innerHTML = "";
     var head = bcTable.createTHead().insertRow();
     [T("Sıra", "Order"), T("Değer", "Value"), T("Kaynak", "Source")].forEach(function (x) { var th = document.createElement("th"); th.textContent = x; head.appendChild(th); });
@@ -347,21 +511,28 @@
     res.parts.forEach(function (p, i) {
       var tr = body.insertRow();
       tr.insertCell().textContent = i + 1;
-      var c = tr.insertCell(); var code = document.createElement("code"); code.textContent = p[0].replace(/ /g, "␣"); c.appendChild(code);
+      tr.insertCell().appendChild(mk("code", null, p[0].replace(/ /g, "␣")));
       tr.insertCell().textContent = p[1];
     });
     var all = body.insertRow(); all.className = "lt-total";
     all.insertCell().textContent = "=";
-    var c2 = all.insertCell(); c2.colSpan = 2; var code2 = document.createElement("code");
-    code2.textContent = res.parts.map(function (p) { return p[0]; }).join("").replace(/ /g, "␣"); c2.appendChild(code2);
+    var c2 = all.insertCell(); c2.colSpan = 2;
+    c2.appendChild(mk("code", null, res.parts.map(function (p) { return p[0]; }).join("").replace(/ /g, "␣")));
     last = (res.lines[0] === "" ? "\n" + res.lines.slice(1).join("\r\n") : res.lines.join("\r\n")) + "\r\n";
     pre.textContent = res.lines.map(function (l) { return l === "" ? "␊ " + T("(boş satır: yalnız LF)", "(empty line: LF only)") : l; }).join("\n");
   }
-  [machine, design, size, lang, second, angle, tol, row].forEach(function (c) { c.addEventListener("input", update); c.addEventListener("change", update); });
-  sample.addEventListener("change", function () { row.value = SAMPLES[parseInt(sample.value, 10)]; update(); });
+
+  function refresh(rebuild) {
+    if (rebuild) { buildData(); buildTabs(); buildPanel(); }
+    render(); save();
+  }
   copy.addEventListener("click", function () {
     var done = function () { copy.textContent = T("Kopyalandı", "Copied"); setTimeout(function () { copy.textContent = T("Komutları kopyala", "Copy commands"); }, 1500); };
     if (navigator.clipboard) navigator.clipboard.writeText(last).then(done, function () {});
   });
-  update();
+  refresh(true);
+
+  /* test hook */
+  root.__lt = { state: function () { return state; }, loadTT405: loadTT405, loadMS300: loadMS300, buildTT405: buildTT405,
+    buildMS300: buildMS300, parseRow: parseRow, refresh: refresh };
 })();

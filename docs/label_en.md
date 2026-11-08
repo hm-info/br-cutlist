@@ -15,7 +15,7 @@ TT405 and MS300 send the label of each cut piece directly to the label printer i
 <!-- web-only -->
 ## Label simulator
 
-Select the machine and settings, then paste a row from the cut list. The page generates the commands the machine would send and an approximate label preview. Positions are the machine's **preset (default) layout**; positions changed on the machine's Printer Settings page may differ.
+The simulator is a copy of the machine's **Printer Settings** page (Text, Barcode, Label and Printer tabs). It opens with the PLC preset loaded. Paste a row from the cut list and change the settings as on the machine; the label preview, barcode content and printer commands are rebuilt with the same rules as the PLC. Click a text or the barcode in the preview to open its settings. Changes are kept only in this browser; **Printer → Load SW Format** does the same as on the PLC.
 
 <div id="label-tool" class="label-tool" data-lang="en"></div>
 <!-- /web-only -->
@@ -84,7 +84,7 @@ Label text contains no Turkish characters. Line numbers match the order on the m
 
 X and Y on the frame line are the length and other axis values minus the **weld allowance** (Settings page).
 
-**MS300 angle suffix (new version):** in the new MS300 software the left / right angles are appended to the location line: `UST(Y) ACI:45/90`. If both angles are 0 nothing is appended.
+**MS300 angle suffix (new version):** in the new MS300 software the left / right angles from the cut list are appended to the location line (4): `UST(Y) ACI:45/90`. If both angles are 0 nothing is appended. The angles are not part of the barcode data. The simulator has it on by default; choose Angle suffix → Off for the old version.
 
 ### Lines that change with TT405 barcode design 2
 
@@ -203,4 +203,5 @@ If the preset is loaded while TT405 barcode design 2 is selected, these position
 - **MS300 density:** the density value is sent with a second `S` (speed) command instead of `D`; the printer may interpret it as speed.
 - **TT405 barcode design 1:** the colour field is always `00`; the colour code from the cut list is not used in this design.
 - **Poz No line:** loading the preset does not change this line's rotation; the previous value is kept.
+- **MS300 C70 panel, Barcode tab:** the vertical start box is labelled "Narrow bar width" and the narrow bar width box is labelled "Vert. start" (labels swapped). The simulator uses the correct names and shows the panel label as a note.
 - **Label length:** in the 103x25 layout the bottom of the barcode exceeds the 160-dot label length; set the label length accordingly.
