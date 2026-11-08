@@ -112,8 +112,7 @@
   function bCmd(b) { return "B" + [b.p1, b.p2, b.p3, BC_TYPES[b.p4] || "", b.p5, b.p6, b.p7, b.p8 ? "B" : "N"].join(",") + ","; }
   function header(st, tt) {
     var l = st.label, out = tt ? [""] : [];
-    out.push("N", "Y38,N,8,1", "Q" + l.Qp1 + "," + l.Qp2 + ",", "q" + l.qp1, "R" + l.Rp1 + "," + l.Rp2, "S" + l.Sp1, "OD",
-      (tt ? "D" : "S") + l.Dp1);
+    out.push("N", "Y38,N,8,1", "Q" + l.Qp1 + "," + l.Qp2 + ",", "q" + l.qp1, "R" + l.Rp1 + "," + l.Rp2, "S" + l.Sp1, "OD", "D" + l.Dp1);
     return out;
   }
 

@@ -34,7 +34,7 @@ Her etiket için komutlar aşağıdaki sırayla gönderilir. Her satır CR LF il
 | `R` | `R5,1` | Başlangıç noktası kaydırması (yatay, dikey) | Etiket → Yatay / Dikey Başl. |
 | `S` | `S3` | Baskı hızı | Etiket → Hız |
 | `OD` | `OD` | Direkt termal baskı | Sabit |
-| `D` | `D15` | Koyuluk. **MS300'de bu değer `D` yerine ikinci bir `S` satırıyla gider** (`S10`). | Etiket → Koyuluk |
+| `D` | `D15` | Koyuluk. MS300 V26.1.11.8 ve önceki sürümlerde bu değer `D` yerine ikinci bir `S` satırıyla gider (`S10`). | Etiket → Koyuluk |
 | `A` | `A30,50,0,2,1,1,N,"PROG NO:1"` | Yazı satırı (her etkin satır için bir tane) | Yazı sekmesi |
 | `B` | `B30,110,0,1B,2,2,40,N,"…"` | Barkod | Barkod sekmesi |
 | `B` | `B30,0,0,1B,2,2,40,N,"0001"` | Yalnız TT405, **2. barkod aktifse**: kesim numarası | 2. Barkod Aktif |
@@ -201,7 +201,7 @@ TT405 barkod tasarımı 2 seçiliyken ön ayar yüklenirse şu konumlar değişi
 
 ## Bilinen durumlar
 
-- **MS300 koyuluk:** koyuluk değeri `D` komutu yerine ikinci bir `S` (hız) komutuyla gönderiliyor; yazıcı bu değeri hız olarak yorumlayabilir.
+- **MS300 koyuluk (V26.1.11.8 ve öncesi):** koyuluk değeri `D` komutu yerine ikinci bir `S` (hız) komutuyla gönderilir; yazıcı bu değeri hız olarak yorumlayabilir. Sonraki sürümlerde `D` ile gider; simülatör `D` gösterir.
 - **TT405 barkod tasarımı 1:** renk alanı her zaman `00` yazılıyor; kesim listesindeki renk kodu bu tasarımda barkoda girmiyor.
 - **Poz No satırı:** ön ayar yüklemesi bu satırın rotasyonunu değiştirmiyor; önceki değer kalır.
 - **MS300 C70 paneli, Barkod sekmesi:** dikey başlangıç kutusunun üstünde "Çizgi Genişliği", çizgi genişliği kutusunun üstünde "Dikey Başl." yazıyor (yazılar yer değiştirmiş). Simülatör doğru adları kullanır ve panelde yazanı not olarak gösterir.

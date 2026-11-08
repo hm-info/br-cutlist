@@ -34,7 +34,7 @@ For every label the commands are sent in the following order. Each line ends wit
 | `R` | `R5,1` | Reference point offset (horizontal, vertical) | Label → Horiz. / Vert. margin |
 | `S` | `S3` | Print speed | Label → Speed |
 | `OD` | `OD` | Direct thermal printing | Fixed |
-| `D` | `D15` | Density. **On MS300 this value is sent as a second `S` line instead of `D`** (`S10`). | Label → Density |
+| `D` | `D15` | Density. On MS300 V26.1.11.8 and earlier this value is sent as a second `S` line instead of `D` (`S10`). | Label → Density |
 | `A` | `A30,50,0,2,1,1,N,"PROG NO:1"` | Text line (one per enabled line) | Text tab |
 | `B` | `B30,110,0,1B,2,2,40,N,"…"` | Barcode | Barcode tab |
 | `B` | `B30,0,0,1B,2,2,40,N,"0001"` | TT405 only, **if the 2nd barcode is active**: cut number | 2. Barcode Active |
@@ -201,7 +201,7 @@ If the preset is loaded while TT405 barcode design 2 is selected, these position
 
 ## Known behaviour
 
-- **MS300 density:** the density value is sent with a second `S` (speed) command instead of `D`; the printer may interpret it as speed.
+- **MS300 density (V26.1.11.8 and earlier):** the density value is sent with a second `S` (speed) command instead of `D`; the printer may interpret it as speed. Later versions send `D`; the simulator shows `D`.
 - **TT405 barcode design 1:** the colour field is always `00`; the colour code from the cut list is not used in this design.
 - **Poz No line:** loading the preset does not change this line's rotation; the previous value is kept.
 - **MS300 C70 panel, Barcode tab:** the vertical start box is labelled "Narrow bar width" and the narrow bar width box is labelled "Vert. start" (labels swapped). The simulator uses the correct names and shows the panel label as a note.
